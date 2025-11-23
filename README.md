@@ -104,7 +104,7 @@ Durante o desenvolvimento, alguns desafios de engenharia foram superados:
 ## 📞 Contato
 
 **Henrique Targino** - Cientista de Dados
-[LinkedIn](https://www.google.com/search?q=https://www.linkedin.com/in/henriquetargino/) | [Portfólio](https://henriquetargino.github.io/Portfolio)
+[LinkedIn](https://www.linkedin.com/in/henriquetargino) | [Portfólio](https://henriquetargino.github.io/Portfolio)
 
 -----
 

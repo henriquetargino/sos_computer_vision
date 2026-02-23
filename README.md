@@ -1,110 +1,111 @@
 # ✋🚨 Signal for Help Detector (Computer Vision)
 
-> Um sistema de segurança baseado em Visão Computacional capaz de identificar o "Sinal de Socorro" (Signal for Help) universal em tempo real e disparar alertas via API.
+> A Computer Vision-based security system capable of identifying the universal "Signal for Help" in real-time and triggering API alerts.
 
-## 🎯 Sobre o Projeto
+## 🎯 About the Project
 
-Este projeto foi desenvolvido para aplicar conceitos de **Ciência de Dados** em um problema do mundo real: segurança pessoal.
+This project applies **Data Science** concepts to a real-world problem: personal safety.
 
-Diferente de abordagens tradicionais que exigem o treinamento de modelos pesados de Deep Learning, este sistema utiliza **Geometria Euclidiana** e **Álgebra Linear** para analisar a biomecânica da mão em tempo real usando apenas CPU. O sistema é capaz de diferenciar movimentos aleatórios de um pedido de socorro intencional através de uma **Máquina de Estados Finita (FSM)**.
+Unlike traditional approaches that rely on computationally heavy Deep Learning models, this system uses **Euclidean Geometry** and **Linear Algebra** to analyze hand biomechanics in real-time using only a CPU. It successfully differentiates random movements from intentional distress signals through a **Finite State Machine (FSM)**.
 
------
+---
 
-## 🛠️ Funcionalidades Técnicas
+## 🛠️ Technical Features
 
-  * **Rastreamento de Mão (Hand Tracking):** Utiliza MediaPipe para extrair 21 landmarks da mão em tempo real.
-  * **Lógica Geométrica:** Calcula distâncias vetoriais entre o dedão e a base do mindinho para validar a posição da mão sem depender de pixels fixos (independente de profundidade).
-  * **Máquina de Estados Temporal:** O alerta não é disparado por uma foto estática. O sistema valida a **sequência** do movimento (Mão Armada -\> Janela de 2s -\> Punho Fechado).
-  * **Processamento Assíncrono (Threading):** O envio da requisição HTTP (Webhook) roda em uma thread separada para evitar o *Blocking I/O*, garantindo que o processamento de vídeo se mantenha fluido a 30 FPS.
-  * **Feedback Visual (UI):** Interface reativa com Bounding Boxes dinâmicos, feedback de estado (Verde/Laranja/Vermelho) e flash de tela para confirmação de envio.
+* **Hand Tracking:** Uses MediaPipe to extract 21 hand landmarks in real-time.
+* **Geometric Logic:** Calculates vector distances between the thumb and the base of the pinky to validate hand positioning independently of depth or fixed pixels.
+* **Temporal State Machine:** Alerts are not triggered by a static frame. The system validates the movement **sequence** (Armed -> 2s Window -> Closed Fist).
+* **Asynchronous Processing (Threading):** HTTP requests (Webhooks) run on a separate thread to prevent *Blocking I/O*, ensuring the video feed remains smooth at 30 FPS.
+* **Visual Feedback (UI):** Reactive interface with dynamic bounding boxes, state feedback (Green/Orange/Red), and screen flashes for visual confirmation.
 
------
+---
 
-## 🧠 Como Funciona (A Lógica)
+## 🧠 How it Works (The Logic)
 
-O algoritmo segue um pipeline de decisão rigoroso para evitar falsos positivos:
+The algorithm follows a strict decision pipeline to avoid false positives:
 
-1.  **Input:** Captura de vídeo via OpenCV (conversão BGR -\> RGB).
-2.  **Vetorização:** Extração das coordenadas `(x, y)` das articulações.
-3.  **Estágio 1 (Armar):**
-      * O sistema verifica se 4 dedos estão levantados.
-      * Calcula a **Distância Euclidiana** (`math.hypot`) entre a ponta do dedão e a base do mindinho. Se a distância for curta (dedão na palma), o sistema entra em estado de **ALERTA (Laranja)**.
-4.  **Estágio 2 (Disparar):**
-      * Uma janela temporal de 2 segundos é aberta.
-      * Se o usuário fechar o punho (todos os dedos baixados) dentro desse tempo, a intenção é confirmada.
-5.  **Output:**
-      * O sistema dispara um POST Request para um Webhook (n8n no meu caso).
-      * A UI pisca em vermelho para confirmar o envio.
+1. **Input:** Video capture via OpenCV (BGR -> RGB conversion).
+2. **Vectorization:** Extraction of joint `(x, y)` coordinates.
+3. **Stage 1 (Arming):**
+* Verifies if 4 fingers are raised.
+* Calculates the **Euclidean Distance** (`math.hypot`) between the thumb tip and pinky base. If the distance is short (thumb tucked in), the system enters the **ALERT** state (Orange).
 
------
 
-## 💻 Tecnologias Utilizadas
+4. **Stage 2 (Triggering):**
+* A 2-second temporal window opens.
+* If the user closes their fist (all fingers down) within this timeframe, the intent is confirmed.
 
-  * **Python 3.10** (Ambiente Virtual Conda para compatibilidade com MediaPipe)
-  * **OpenCV (`cv2`)**: Manipulação de imagem e desenho de UI.
-  * **MediaPipe**: Extração de landmarks.
-  * **NumPy & Math**: Cálculos vetoriais e geometria.
-  * **Requests**: Integração com API.
-  * **Threading**: Gerenciamento de concorrência.
 
------
+5. **Output:**
+* The system fires a POST Request to a Webhook (e.g., n8n).
+* The UI flashes red to confirm a successful distress signal.
 
-## 🚀 Como Rodar
 
-### Pré-requisitos
 
-Certifique-se de ter o Python instalado (Recomendado Python 3.10).
+---
 
-1.  **Clone o repositório:**
+## 💻 Tech Stack
 
-<!-- end list -->
+* **Python 3.10** (Conda Virtual Environment for MediaPipe compatibility)
+* **OpenCV (`cv2`)**: Image manipulation and UI rendering.
+* **MediaPipe**: Landmark extraction.
+* **NumPy & Math**: Vector calculations and geometry.
+* **Requests**: API integration.
+* **Threading**: Concurrency management.
+
+---
+
+## 🚀 How to Run
+
+### Prerequisites
+
+Ensure you have Python installed (Python 3.10 recommended).
+
+1. **Clone the repository:**
 
 ```bash
 git clone https://github.com/henriquetargino/sos_computer_vision.git
 cd sos_computer_vision
+
 ```
 
-2.  **Instale as dependências:**
-
-<!-- end list -->
+2. **Install dependencies:**
 
 ```bash
 pip install opencv-python mediapipe numpy requests
+
 ```
 
-3.  **Configure o Webhook (Opcional):**
-    No arquivo `main.py`, edite a função `webhook_socorro` e adicione sua URL:
-
-<!-- end list -->
+3. **Configure the Webhook (Optional):**
+In the `main.py` file, edit the `webhook_socorro` function and add your URL:
 
 ```python
-url = "link_webhook_aqui"
+url = "your_webhook_link_here"
+
 ```
 
-4.  **Execute:**
-
-<!-- end list -->
+4. **Execute:**
 
 ```bash
 python main.py
+
 ```
 
------
+---
 
-## 📈 Aprendizados e Desafios
+## 📈 Learnings & Challenges
 
-Durante o desenvolvimento, alguns desafios de engenharia foram superados:
+Several engineering challenges were overcome during development:
 
-  * **Canais de Cor:** O tratamento de matrizes BGR do OpenCV vs RGB dos modelos de IA.
-  * **Concorrência:** A implementação de Threading foi crucial. Sem ela, o vídeo "congelava" enquanto o Python aguardava a resposta do servidor HTTP.
-  * **UX de Segurança:** A criação de feedbacks visuais (Caixa de Foco e Flash) para dar certeza ao usuário de que o sistema entendeu o comando.
+* **Color Channels:** Handling OpenCV's BGR matrices vs. AI models' RGB requirements.
+* **Concurrency:** Implementing Threading was crucial. Without it, the video feed would freeze while Python waited for the HTTP server's response.
+* **Safety UX:** Designing visual feedback (Focus Boxes and Flashes) to assure the user that the system understood the command.
 
------
+---
 
-## 📞 Contato
+## 📞 Contact
 
-**Henrique Targino** - Cientista de Dados
-[LinkedIn](https://www.linkedin.com/in/henriquetargino) | [Portfólio](https://henriquetargino.github.io/Portfolio)
+**Henrique Targino** - Data Scientist
+[LinkedIn](https://www.linkedin.com/in/henriquetargino) | [Portfolio](https://henriquetargino.github.io/Portfolio)
 
------
-
+---
